@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="About CampusEvents - a static page built with pure HTML, CSS and vanilla JavaScript." />
+  <title>About - CampusEvents</title>
+  <style>
+    /* Pure CSS: custom properties, grid, flexbox, transitions, media queries, dark theme */
+    :root { --bg:#f6f7fb; --surface:#fff; --text:#1c2233; --muted:#5d6680; --border:#dde2ef; --primary:#4f46e5; --accent:#f59e0b; }
+    [data-theme="dark"] { --bg:#0f1220; --surface:#181c2f; --text:#e8eaf6; --muted:#9aa3c4; --border:#2b3150; --primary:#818cf8; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:var(--bg); color:var(--text); line-height:1.6; transition: background .2s, color .2s; }
+    a { color: var(--primary); }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); }
+    header nav { max-width: 1000px; margin: 0 auto; padding: .8rem 1.25rem; display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; }
+    header .links { display:flex; gap:1.2rem; align-items:center; }
+    .brand { font-weight:800; font-size:1.2rem; text-decoration:none; color:var(--text); }
+    button { font: inherit; cursor: pointer; }
+    #theme-toggle { background:var(--bg); border:1px solid var(--border); border-radius:50%; width:38px; height:38px; }
+    main { max-width: 1000px; margin: 0 auto; padding: 2rem 1.25rem 3rem; }
+    h1 { font-size: clamp(1.7rem, 4vw, 2.4rem); margin-top:0; }
+    .lead { color: var(--muted); font-size: 1.1rem; max-width: 65ch; }
+    .grid { display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem; align-items:start; }
+    section { background: var(--surface); border:1px solid var(--border); border-radius: 12px; padding: 1.3rem; }
+    section h2 { margin-top:0; font-size:1.25rem; }
+
+    /* Calendar widget */
+    .cal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:.8rem; }
+    .cal-head button { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:.3rem .8rem; color:var(--text); }
+    .cal-head button:hover { border-color: var(--primary); }
+    .cal-grid { display:grid; grid-template-columns: repeat(7, 1fr); gap:4px; text-align:center; }
+    .cal-grid .dow { font-size:.75rem; color:var(--muted); font-weight:700; padding:.3rem 0; }
+    .cal-grid .day { aspect-ratio:1; display:grid; place-items:center; border-radius:8px; border:1px solid transparent; background:transparent; color:var(--text); position:relative; transition: background .15s, border-color .15s; }
+    .cal-grid button.day:hover { border-color: var(--primary); }
+    .day.today { border-color: var(--primary); font-weight:700; }
+    .day.has-event::after { content:""; position:absolute; bottom:5px; width:6px; height:6px; border-radius:50%; background: var(--accent); }
+    .day.selected { background: var(--primary); color:#fff; }
+    #cal-detail { margin-top:1rem; min-height:3rem; color:var(--muted); }
+
+    /* FAQ accordion */
+    .faq-item { border-bottom:1px solid var(--border); }
+    .faq-item:last-child { border-bottom:0; }
+    .faq-q { width:100%; text-align:left; background:none; border:0; color:var(--text); font-weight:600; padding:.9rem 0; display:flex; justify-content:space-between; gap:1rem; }
+    .faq-q::after { content:"+"; font-size:1.3rem; color:var(--primary); transition: transform .2s; }
+    .faq-q[aria-expanded="true"]::after { transform: rotate(45deg); }
+    .faq-a { max-height:0; overflow:hidden; transition: max-height .3s ease; color:var(--muted); }
+    .faq-a p { margin:0 0 1rem; }
+
+    footer { text-align:center; color:var(--muted); padding:1.5rem; font-size:.85rem; }
+    :focus-visible { outline:3px solid var(--accent); outline-offset:2px; }
+    @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+    @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+  </style>
+  <script>
+    // Apply saved theme early (shares the key used by the React app).
+    try { var t = localStorage.getItem('cems_theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) {}
+  </script>
+</head>
+<body>
+  <header>
+    <nav aria-label="Main">
+      <a class="brand" href="/">🎓 CampusEvents</a>
+      <div class="links">
+        <a href="/">Home</a>
+        <a href="/events">Events</a>
+        <button id="theme-toggle" type="button" aria-label="Toggle theme">🌙</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <h1>About CampusEvents</h1>
+    <p class="lead">
+      CampusEvents is a College Event Management System. This page is written in plain HTML, CSS and vanilla JavaScript
+      (no React) to show the fundamentals behind the app: semantic markup, responsive layout, and DOM scripting.
+    </p>
+
+    <div class="grid">
+      <section aria-labelledby="cal-title">
+        <h2 id="cal-title">Event calendar</h2>
+        <div class="cal-head">
+          <button type="button" id="prev" aria-label="Previous month">&larr;</button>
+          <strong id="cal-month" aria-live="polite"></strong>
+          <button type="button" id="next" aria-label="Next month">&rarr;</button>
+        </div>
+        <div class="cal-grid" id="cal-grid" role="grid" aria-labelledby="cal-month"></div>
+        <p id="cal-detail" aria-live="polite">Select a highlighted day to see events.</p>
+      </section>
+
+      <section aria-labelledby="faq-title">
+        <h2 id="faq-title">Frequently asked questions</h2>
+        <div id="faq">
+          <article class="faq-item">
+            <h3 style="margin:0"><button class="faq-q" type="button" aria-expanded="false" aria-controls="a1" id="q1">How do I register for an event?</button></h3>
+            <div class="faq-a" id="a1" role="region" aria-labelledby="q1"><p>Create a student account, open any event and click "Register now". You can cancel from your dashboard any time before the event.</p></div>
+          </article>
+          <article class="faq-item">
+            <h3 style="margin:0"><button class="faq-q" type="button" aria-expanded="false" aria-controls="a2" id="q2">What if an event is full?</button></h3>
+            <div class="faq-a" id="a2" role="region" aria-labelledby="q2"><p>Seats are limited by the organizer's capacity. If someone cancels, a seat opens up and you can register again.</p></div>
+          </article>
+          <article class="faq-item">
+            <h3 style="margin:0"><button class="faq-q" type="button" aria-expanded="false" aria-controls="a3" id="q3">Who can create events?</button></h3>
+            <div class="faq-a" id="a3" role="region" aria-labelledby="q3"><p>Only administrators can create, edit and delete events, view attendee lists and export them as CSV.</p></div>
+          </article>
+          <article class="faq-item">
+            <h3 style="margin:0"><button class="faq-q" type="button" aria-expanded="false" aria-controls="a4" id="q4">Is my password stored safely?</button></h3>
+            <div class="faq-a" id="a4" role="region" aria-labelledby="q4"><p>Yes. Passwords are hashed with bcrypt and never stored or returned in plain text.</p></div>
+          </article>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>&copy; <span id="year"></span> College Event Management System - Web Technology Project</footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // ---------- Theme toggle (localStorage) ----------
+      var root = document.documentElement;
+      var toggle = document.getElementById('theme-toggle');
+      function syncIcon() { toggle.textContent = root.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙'; }
+      toggle.addEventListener('click', function () {
+        var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('cems_theme', next); } catch (e) {}
+        syncIcon();
+      });
+      syncIcon();
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      // ---------- Calendar widget ----------
+      var API = (window.CEMS_API_URL || 'http://localhost:5000/api');
+      var grid = document.getElementById('cal-grid');
+      var title = document.getElementById('cal-month');
+      var detail = document.getElementById('cal-detail');
+      var view = new Date(); view.setDate(1);
+      var eventsByDay = {}; // "YYYY-MM-DD" -> [event, ...]
+      var DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+      function key(y, m, d) { return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0'); }
+
+      function render() {
+        var y = view.getFullYear(), m = view.getMonth();
+        title.textContent = view.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+        grid.innerHTML = '';
+        DOW.forEach(function (d) {
+          var h = document.createElement('div'); h.className = 'dow'; h.textContent = d; h.setAttribute('role', 'columnheader'); grid.appendChild(h);
+        });
+        var first = new Date(y, m, 1).getDay();
+        var days = new Date(y, m + 1, 0).getDate();
+        for (var i = 0; i < first; i++) grid.appendChild(document.createElement('div'));
+        var today = new Date();
+        for (var d = 1; d <= days; d++) {
+          var k = key(y, m, d);
+          var has = eventsByDay[k];
+          var cell = document.createElement(has ? 'button' : 'div');
+          cell.className = 'day' + (has ? ' has-event' : '');
+          cell.textContent = d;
+          cell.setAttribute('role', 'gridcell');
+          if (d === today.getDate() && m === today.getMonth() && y === today.getFullYear()) cell.classList.add('today');
+          if (has) {
+            cell.type = 'button';
+            cell.setAttribute('aria-label', d + ' ' + title.textContent + ', ' + has.length + ' event(s)');
+            cell.dataset.key = k;
+          }
+          grid.appendChild(cell);
+        }
+      }
+
+      // Event delegation: one listener handles all day buttons.
+      grid.addEventListener('click', function (e) {
+        var btn = e.target.closest('button.day');
+        if (!btn) return;
+        Array.prototype.forEach.call(grid.querySelectorAll('.selected'), function (n) { n.classList.remove('selected'); });
+        btn.classList.add('selected');
+        var list = eventsByDay[btn.dataset.key] || [];
+        detail.innerHTML = '';
+        list.forEach(function (ev) {
+          var a = document.createElement('a');
+          a.href = '/events/' + ev._id;
+          a.textContent = ev.title; // textContent avoids HTML injection
+          var p = document.createElement('div');
+          p.appendChild(a);
+          p.appendChild(document.createTextNode(' - ' + ev.startTime + ', ' + ev.venue));
+          detail.appendChild(p);
+        });
+      });
+
+      document.getElementById('prev').addEventListener('click', function () { view.setMonth(view.getMonth() - 1); render(); });
+      document.getElementById('next').addEventListener('click', function () { view.setMonth(view.getMonth() + 1); render(); });
+
+      // Load events from the REST API (the widget still works without it).
+      fetch(API + '/events?limit=50')
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          (data.events || []).forEach(function (ev) {
+            var k = ev.date.slice(0, 10);
+            (eventsByDay[k] = eventsByDay[k] || []).push(ev);
+          });
+          render();
+        })
+        .catch(function () { detail.textContent = 'Could not load events - is the API running?'; });
+      render();
+
+      // ---------- FAQ accordion ----------
+      document.getElementById('faq').addEventListener('click', function (e) {
+        var btn = e.target.closest('.faq-q');
+        if (!btn) return;
+        var panel = document.getElementById(btn.getAttribute('aria-controls'));
+        var open = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!open));
+        panel.style.maxHeight = open ? '0' : panel.scrollHeight + 'px';
+      });
+    })();
+  </script>
+</body>
+</html>

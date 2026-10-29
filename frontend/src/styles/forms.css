@@ -1,0 +1,26 @@
+.field { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 1rem; }
+.field label { font-weight: 600; font-size: 0.9rem; }
+.field input, .field select, .field textarea {
+  font: inherit; color: var(--text); background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 0.6rem 0.75rem; width: 100%; transition: border-color var(--transition), box-shadow var(--transition);
+}
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2); }
+.field [aria-invalid='true'] { border-color: var(--danger); }
+.field-error { color: var(--danger); font-size: 0.82rem; margin: 0; }
+
+.form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.6rem; box-shadow: var(--shadow); }
+.form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 1.2rem; }
+.form-grid .wide { grid-column: 1 / -1; }
+.form-actions { display: flex; justify-content: flex-end; }
+
+.auth-wrap { display: grid; place-items: center; padding: 2.5rem 1.25rem; }
+.auth-card { width: 100%; max-width: 420px; }
+.auth-card.wide-card { max-width: 720px; }
+.auth-switch { text-align: center; margin: 1rem 0 0; color: var(--muted); }
+
+/* Search & filter bar (Flexbox) */
+.filter-bar { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: flex-end; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-block: 1rem 1.4rem; }
+.filter-bar .field { margin: 0; min-width: 140px; }
+.filter-bar .grow { flex: 1 1 220px; }
+.result-count { color: var(--muted); }
+.pagination { display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 2rem; }
